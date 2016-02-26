@@ -1,87 +1,79 @@
-jQuery Slider plugin by Mario Iliev
+jQuery plugin to customize the default select list
 
 Mobile support (with jQuery Mobile)
+
 Without jQuery Mobile dragging is disabled and user can only tap on the slider path.
 
+#	Plugin initialize
+	Option 1: Add "data-slider-box" to a <div>
+	Option 2: Call $(selector).createSlide(); to a <div> tag
 
-Plugin initialize
-Option 1: Add "data-slider-box" to a <div>
-Option 2: Call $(selector).createSlide(); to a <div> tag
+#	Plugin parameters
+###width
+	Type: Number
+	Define the slider width in px.
+	Default - false (Slider takes the width of its container)
 
-Plugin parameters
+###output
+	Type: selector ('.class' or '#id')
+	Defines where the slider value will appear.
+	Default - false (Value is placed inside the sliders dragger button)
+	
+###firstvalue
+	Type: Number/String (10 or 'Miles')
+	Defines the initial value before user slides the dragger.
+	Default - false (First value will appear as 0)
+	
+###maxvalue
+	Type: Number
+	Defines the maximum value (from 0 to 187 etc.)
+	Default - false (maximum value is 100)
+	
+###interval
+	Type: Number
+	Defines the value interval. Example: when set to 5 the slider will output values like this "5, 10, 15 etc."
+	The maximum value should be devisable by the interval number otherwise this property wont take action.
+	Default - false (no interva: value is visualized as 1,2,3 etc.)
+	
+###progress
+	Type: Boolean
+	Additional element is added to visualize the path which the dragger has travelled.
+	Default - false
+	
+###destroy
+	Type: Boolean
+	By destroying the plugin you will remove the sliders HTML and javascript events.
+	Default: false
+	
+#	Plugin Styling
+	* The wrapping slider <div> gets class "container" and "_1" as being the number of sliders on the page.
+	* Inside of it there is the dragger button <div> with class "dragger"
+	* When the dragger <div> is clicked it gets class "dragging"
+	* If 'progress' parameter is called the container <div> gets one more <div> with class "progress"
 
-width
-Type: Number
-Define the slider width in px.
-Default - false (Slider takes the width of its container)
+###### 	The plugin doesn't apply visual styling.
+###### 	You can use this basic CSS to get started with your customization:
 
-
-output
-Type: selector ('.class' or '#id')
-Defines where the slider value will appear.
-Default - false (Value is placed inside the sliders dragger button)
-
-
-firstvalue
-Type: Number/String (10 or 'Miles')
-Defines the initial value before user slides the dragger.
-Default - false (First value will appear as 0)
-
-
-maxvalue
-Type: Number
-Defines the maximum value (from 0 to 187 etc.) 
-Default - false (maximum value is 100)
-
-
-interval
-Type: Number
-Defines the value interval. Example: when set to 5 the slider will output values like this "5, 10, 15 etc."
-The maximum value should be devisable by the interval number otherwise this property wont take action.
-Default - false (no interva: value is visualized as 1,2,3 etc.)
-
-
-progress
-Type: Boolean
-Additional element is added to visualize the path which the dragger has travelled.
-Default - false
-
-
-destroy
-Type: Boolean
-By destroying the plugin you will remove the sliders HTML and javascript events.
-Default - false
-
-Plugin Styling
-* The wrapping slider <div> gets class "container" and "_1" as being the number of sliders on the page.
-* Inside of it there is the dragger button <div> with class "dragger"
-* When the dragger <div> is clicked it gets class "dragging"
-* If 'progress' parameter is called the container <div> gets one more <div> with class "progress"
-
-The plugin doesn't apply visual styling.
-
-You can use this basic CSS to get started with your customization:
-
-/* Plugin CSS */
-.container {
-	height: 5px;
-	margin: 30px auto;
-	background-color: #DADADA;
-}
-.dragger {
-	width: 40px;
-	height: 40px;
-	color: #FFF;
-	font-weight: 600;
-	line-height: 40px;
-	background-color: #FFA11B;
-	border-radius: 25px;
-}
-.dragging {
-	background-color: #FFC168;
-	box-shadow: inset 0px 0px 20px #E47E00;
-}
-.progress {
-	width: 0px;
-	background-color: #FF952C;
-}
+	/* Plugin CSS */
+	.container {
+		height: 5px;
+		margin: 30px auto;
+		background-color: #DADADA;
+	}
+	.dragger {
+		width: 40px;
+		height: 40px;
+		color: #FFF;
+		font-weight: 600;
+		line-height: 40px;
+		background-color: #FFA11B;
+		border-radius: 25px;
+	}
+	.dragging {
+		background-color: #FFC168;
+		box-shadow: inset 0px 0px 20px #E47E00;
+	}
+	.progress {
+		width: 0px;
+		background-color: #FF952C;
+	}
