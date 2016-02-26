@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<title>jQuery Slider by Mario Iliev</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css' property='stylesheet'>
+
+<style>
+	/* Presentation CSS */
+	body {
+		margin: 0;
+		padding: 0;
+		font-family: 'Open Sans',Helvetica,Arial,sans-serif;
+		height: 600px;
+	}
+	.wrap {
+		max-width: 500px;
+		padding-bottom: 30px;
+		margin: 50px auto 0 auto;
+	}
+	.heading {
+		color: #009481;
+		text-align: center;
+		margin: 0 0 40px 0;
+	}
+	.explain {
+		margin: 0 0 40px 0;
+		padding: 30px 0 0 0;
+		border-top: 1px solid #ccc;
+	}
+	.explain span {
+		display: block;
+		width: 100%;
+		padding: 7px 15px;
+		margin: 8px 0 0 0;
+		font-size: 15px;
+		color: #394873;
+		background-color: #ECECEC;
+		box-sizing: border-box;
+	}
+	.explain:first-child {
+		border: none;
+	}
+	.output {
+		width: 50px;
+		color: #EC8500;
+		font-weight: 600;
+		text-align: center;
+		margin: -20px auto 30px auto;
+	}
+	div:focus {
+		outline: none;
+	}
+	.ui-loader {
+		display: none;
+	}
+	/* Plugin CSS */
+	.container {
+		height: 5px;
+		margin: 0 auto 60px auto;
+		background-color: #DADADA;
+	}
+	.dragger {
+		width: 40px;
+		height: 40px;
+		color: #FFF;
+		font-weight: 600;
+		line-height: 40px;
+		background-color: #FFA11B;
+		border-radius: 25px;
+	}
+	.dragging {
+		background-color: #FFC168;
+		box-shadow: inset 0px 0px 20px #E47E00;
+	}
+	.progress {
+		width: 0px;
+		background-color: #FF952C;
+	}
+</style>
+
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+<script>
+// Eliminates localhost jQuery mobile error. Not needed in live enviorment.
+$(document).bind('mobileinit',function(){
+	$.mobile.hashListeningEnabled = false;
+});
+</script>
+
+<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+<script>
+/*  
+	Project: jQuery slider - 2016
+	Description: Basic but powerfull jQuery slider
+	Author: Mario Iliev
+	GitHub: https://github.com/mario-iliev
+	---------------------------
+	Full specification: https://github.com/mario-iliev
+*/
+;(function ($) {
+	'use strict';
+	var isMob = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0) ? true : false;
+	var id = 0;
+	var toDestroy = 0;
+	var screen = $(document);
+	var mouseup = isMob && $.mobile ? 'vmouseup.slider' : 'mouseup.slider';
+	var mousedown = isMob && $.mobile ? 'vmousedown.slider' : 'mousedown.slider';
+	var mousemove = isMob && $.mobile ? 'vmousemove.slider' : 'mousemove.slider';
+
+	// Remove generated html and clear events
+	var destroyPlugin = function(id) {
+		$('.container._'+id).off(mouseup+id).off(mousedown+id).remove();
+	};
+
+	// Main plugin logic
+	var slider = function (el, opts) {
+		var el = $(el);
+		var lastValue = 0;
+		var lastPosistion = 0;
+		var maxValue = opts.maxvalue ? opts.maxvalue : 100;
+		var boxWidth = typeof opts.width == 'number' ? opts.width : el.outerWidth();
+		var countTrough = opts.interval && maxValue % opts.interval == 0 ? opts.interval : false;
+		var progress = opts.progress ? '<div class="progress" style="position: absolute; top: 0; left: 0;"></div>' : '';
+
+		// If 'destroy' parameter is called
+		if (opts.destroy) {
+			destroyPlugin(id);
+			return false;
+		}
+
+		// Append HTML and CSS needed for the plugin
+		el.each(function() {
+			id = ++id;
+			$(this)
+				.addClass('container _'+id)
+				.css({'width' : boxWidth, 'min-height' : '1px', 'position' : 'relative', 'cursor' : 'pointer'})
+				.html('<div class="dragger" style="position: absolute; min-width: 10px; min-height: 10px; outline: none; cursor: pointer; text-align: center; z-index: 1;"></div>'+progress);
+		});
+
+		var box = $('.container._'+id);
+		var drag = $('.container._'+id+' .dragger');
+		var progressBar = opts.progress ? $('.container._'+id+' .progress') : '';
+		var boxHeight = box.outerHeight();
+		var output = opts.output ? $(opts.output) : drag;
+		var firstVal = opts.firstvalue ? opts.firstvalue : 0;
+
+		// Show the initial value
+		output.text(firstVal);
+
+		var dragWidth = drag.outerWidth();
+		var dragHeight = drag.outerHeight();
+		var dragCentered = Math.ceil((dragHeight - boxHeight) / 2);
+
+		// Center vertically the dragger
+		drag.css({'top': -dragCentered + 'px'});
+		// Adjust the progress div height 
+		if (progress) 
+			progressBar.css({'height' : boxHeight + 'px'});
+
+		var moveSlider = function(evt, dragOffset, boxOffset) {
+			var posX = evt.pageX - (boxOffset + dragOffset);
+			var value = Math.round( (posX / (boxWidth - dragWidth)) * maxValue);
+
+			// Stop calculations if the mouse is outside of the box horizontally
+			if (value > (maxValue + 20) || value < -20) return;
+
+			var txtValue = Math.min(Math.max(parseInt(value), 0), maxValue);
+			var cssVal = Math.min(Math.max(parseInt(posX), 0), (boxWidth - dragWidth));
+			var diff = Math.abs(lastPosistion - txtValue);
+
+			// Update the Value only when needed
+			if (diff > 0) {
+				lastPosistion = txtValue;
+
+				if (countTrough) {
+					if (txtValue % countTrough == 0) {
+						lastValue = txtValue;
+					} else {
+						txtValue = lastValue;
+						return false;
+					}
+				}
+
+				output.text(txtValue);
+
+				if (!txtValue) output.text(firstVal);
+			}
+
+			// Move the dragger
+			drag.css({'left': cssVal + 'px'});
+
+			if (progress) {
+				progressBar.css({'width': (cssVal + (dragWidth / 2) ) + 'px'});
+			}
+		}
+
+		// When mouse button is down on the slider
+		box.on(mousedown+id, function(e) {
+			var boxOffset = box.offset().left;
+
+			if (isMob) {
+				var dragOffset = dragWidth / 2;
+			} else {
+				var dragOffset = drag.is(e.target) ? e.offsetX + 1 : dragWidth / 2;
+			}
+
+			drag.addClass('dragging');
+
+			moveSlider(e, dragOffset, boxOffset);
+
+			screen.delegate(box, mousemove+id, function(e) {
+
+				moveSlider(e, dragOffset, boxOffset);
+
+				// Desktop: Stop page scrolling while using the slider
+				screen.on('mousewheel.slider'+id, function(e) {
+					e.preventDefault();
+				});
+
+				// Mobile: Stop page scrolling while using the slider
+				return false; 
+			})
+			.on(mouseup+id, function() {
+				if (drag.hasClass('dragging')) {
+					screen.off(mousemove+id);
+					drag.removeClass('dragging');
+				}
+
+				screen.unbind('mousewheel.slider'+id);
+			});
+		})
+		.on(mouseup+id, function() {
+			screen.off(mousemove+id);
+			drag.removeClass('dragging');
+		});
+	};
+
+	$.fn.createSlide = function (options, callback) {
+		var opts = $.extend({}, $.fn.createSlide.defaults, options, callback);
+
+		return this.each(function () {
+			new slider($(this), opts);
+		});
+	}
+	// Define plugin options
+	$.fn.createSlide.defaults = { width: false, output: false, firstvalue: false, maxvalue: false, interval: false, progress: false, destroy: false };
+
+	// Search for data attribute and auto run the plugin
+	$(function(){
+		$('div[data-slider-box]').createSlide();
+	});
+})(jQuery);
+
+</script>
+
+</head>
+<body>
+
+<script>
+	$(function() {
+		$('.preview2').createSlide({ width: 250, firstvalue: 'Hey' });
+		$('.preview3').createSlide({ output: '.output', maxvalue: 165 });
+		$('.preview4').createSlide({ progress: true, interval: 5 });
+	});
+</script>
+
+<div class="wrap">
+	<div class="heading">
+		<h1>jQuery Slider by Mario Iliev</h1>
+		<h2>Mobile supported (needs jQuery Mobile js)</h2>
+		<h3>Some examples:</h3>
+	</div>
+
+
+	<div class="explain">
+		Called without parameters only with <b>&lt;div data-slider-box&gt;&lt;/div&gt;</b>
+	</div>
+	<div data-slider-box></div>
+
+
+	<div class="explain">
+		Specified a fixed width of <b>250px</b> and <b>initial value</b><br>
+		<span>$('.preview2').createSlide({ width: 250, firstvalue: 'Hey' });</span>
+	</div>
+	<div class="preview2"></div>
+
+
+	<div class="explain">
+		Place the output <b>value outside</b> the slider and set the <b>maximum value</b> of 165<br>
+		<span>$('.preview3').createSlide({ output: '.output', maxvalue: 165 });</span>
+	</div>
+	<div class="output"></div>
+	<div class="preview3"></div>
+
+
+	<div class="explain">
+		Indicate the <b>progress</b> with background color and <br>set the <b>value interval</b> by 5<br>
+		<span>$('.preview4').createSlide({ progress: true, interval: 5 });</span>
+	</div>
+	<div class="preview4"></div>
+</div>
+
+</body>
+</html>
