@@ -13,37 +13,44 @@ Without jQuery Mobile dragging is disabled and user can only tap on the slider p
 	Type: Number
 	Define the slider width in px.
 	Default - false (Slider takes the width of its container)
+	$(selector).createSlide({ width: 250 });
 
 ###output
 	Type: selector ('.class' or '#id')
 	Defines where the slider value will appear.
 	Default - false (Value is placed inside the sliders dragger button)
+	$(selector).createSlide({ output: '.myclass' }); OR $(selector).createSlide({ output: '#myid' });
 	
 ###firstvalue
-	Type: Number/String (10 or 'Miles')
+	Type: Number/String (10 or 'Slide me')
 	Defines the initial value before user slides the dragger.
 	Default - false (First value will appear as 0)
+	$(selector).createSlide({ firstvalue: 'Slide me' });
 	
 ###maxvalue
 	Type: Number
 	Defines the maximum value (from 0 to 187 etc.)
 	Default - false (maximum value is 100)
+	$(selector).createSlide({ maxvalue: 187 });
 	
 ###interval
 	Type: Number
 	Defines the value interval. Example: when set to 5 the slider will output values like this "5, 10, 15 etc."
 	The maximum value should be devisable by the interval number otherwise this property wont take action.
 	Default - false (no interva: value is visualized as 1,2,3 etc.)
+	$(selector).createSlide({ interval: 5 });
 	
 ###progress
 	Type: Boolean
 	Additional element is added to visualize the path which the dragger has travelled.
 	Default - false
+	$(selector).createSlide({ progress: true });
 	
 ###destroy
 	Type: Boolean
 	By destroying the plugin you will remove the sliders HTML and javascript events.
 	Default: false
+	$(selector).createSlide({ destroy: true });
 	
 #	Plugin Styling
 	* The wrapping slider <div> gets class "container" and "_1" as being the number of sliders on the page.
