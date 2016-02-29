@@ -4,6 +4,8 @@ Mobile support (with jQuery Mobile)
 
 Without jQuery Mobile dragging is disabled and user can only tap on the slider path.
 
+###DEMO: http://marioiliev.com/demos/jquery-slider/
+
 #	Plugin initialize
 	Option 1: Add "data-slider-box" to a <div>
 	Option 2: Call $(selector).createSlide(); to a <div> tag
